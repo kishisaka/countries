@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">countries</string>
+    <string name="no_countries_found">No countries found or server not available</string>
+</resources>
