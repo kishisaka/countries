@@ -49,7 +49,7 @@ class CountryActivity : AppCompatActivity(), CountryContract.View {
         emptyList.visibility = View.VISIBLE
     }
 
-    override fun hideNothingInListOrErrror() {
+    override fun hideNothingInListOrError() {
         emptyList.visibility = View.GONE
     }
 

@@ -7,7 +7,7 @@ interface CountryContract {
         fun showProgress()
         fun hideProgress()
         fun showNothingInListOrError()
-        fun hideNothingInListOrErrror()
+        fun hideNothingInListOrError()
         fun updateCountries(countries: Array<Country>)
     }
 

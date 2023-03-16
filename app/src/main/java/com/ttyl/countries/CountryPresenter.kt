@@ -22,7 +22,7 @@ class CountryPresenter(private var mainView: CountryContract.View?,
                     if (it.isEmpty()) {
                         mainView?.showNothingInListOrError()
                     } else {
-                        mainView?.hideNothingInListOrErrror()
+                        mainView?.hideNothingInListOrError()
                     }
                     mainView?.updateCountries(it)
                 }
