@@ -32,7 +32,7 @@ class CountryActivity : AppCompatActivity(), CountryContract.View {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // get countries, present it!
-        countryPresenter = CountryPresenter(this, CountryModel(CountryDao(), Dispatchers.IO))
+        countryPresenter = CountryPresenter(CountryCallback(this), this, CountryModel(CountryDao(), Dispatchers.IO))
         countryPresenter.publishCountries()
     }
 
