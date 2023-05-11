@@ -1,76 +1,59 @@
 package com.ttyl.countries.com.ttyl.countries
 
 import android.util.Log
-import com.ttyl.countries.*
+import androidx.lifecycle.MutableLiveData
+import com.ttyl.countries.Country
+import com.ttyl.countries.CountryCallback
+import com.ttyl.countries.CountryDao
 import io.mockk.*
-import io.mockk.impl.annotations.MockK
+import org.junit.Assert.assertArrayEquals
 import org.junit.Test
 import retrofit2.Call
 import retrofit2.Response
 
 class CountryCallbackTest {
 
-    @MockK
-    var countryView: CountryActivity = mockk()
-
-    @MockK
-    var call: Call<Array<Country>> = mockk()
-
-    @MockK
-    var response: Response<Array<Country>> = mockk()
+    val response: Response<Array<Country>> = mockk()
+    var countryDoneState: MutableLiveData<Array<Country>> = mockk()
+    val call: Call<Array<Country>> = mockk()
+    val throwable: Throwable = mockk()
 
     @Test
-    fun `test callback onResponse success` () {
-        every { response.body() } returns arrayOf(
-            Country("test1", "region1", "code1", "cap1"),
-            Country("test2", "region2", "code2", "cap2"))
-        every { response.code() } returns 200
-        every { countryView.hideProgress() } just Runs
-        every { countryView.hideNothingInListOrError() } just Runs
-        every { countryView.updateCountries(arrayOf(
-            Country("test1", "region1", "code1", "cap1"),
-            Country("test2", "region2", "code2", "cap2")))} just runs
-        val countryCallBack = CountryCallback(countryView)
-        countryCallBack.onResponse(call, response)
-        verify { countryView.hideProgress() }
-        verify { countryView.hideNothingInListOrError() }
-        verify { countryView.updateCountries(arrayOf(
-            Country("test1", "region1", "code1", "cap1"),
-            Country("test2", "region2", "code2", "cap2")))}
-        verify(exactly = 0) { countryView.showNothingInListOrError() }
+    fun `callback success`() {
+        every { response.code() } returns CountryDao.HTTP_OK
+        every { response.body() } returns arrayOf(Country("test1", "test2", "test3", "test4"))
+        every {countryDoneState.setValue(arrayOf(Country("test1", "test2", "test3", "test4")))} just Runs
+        every {countryDoneState.value} returns arrayOf(Country("test1", "test2", "test3", "test4"))
+        val callBack = CountryCallback(countryDoneState)
+        callBack.onResponse(call, response)
+        assertArrayEquals(countryDoneState.value, arrayOf(Country("test1", "test2", "test3", "test4")))
     }
 
     @Test
-    fun `test callback onResponse success on http error 500` () {
+    fun `callback success 400`() {
+        every { response.code() } returns 400
         every { response.body() } returns arrayOf()
-        every { response.code() } returns 500
-        every { countryView.hideProgress() } just Runs
-        every { countryView.hideNothingInListOrError() } just Runs
-        every { countryView.updateCountries(arrayOf()) } just runs
-        every { countryView.showNothingInListOrError() } just runs
-        val countryCallBack = CountryCallback(countryView)
-        countryCallBack.onResponse(call, response)
-        verify { countryView.hideProgress() }
-        verify { countryView.showNothingInListOrError() }
-        verify(exactly = 0) { countryView.hideNothingInListOrError() }
-        verify(exactly = 0) { countryView.updateCountries(arrayOf())}
+        every {countryDoneState.setValue(arrayOf())} just Runs
+        every {countryDoneState.value} returns arrayOf()
+        val callBack = CountryCallback(countryDoneState)
+        callBack.onResponse(call, response)
+        assertArrayEquals(countryDoneState.value, arrayOf())
     }
 
     @Test
-    fun `test callback onFailure` () {
+    fun `callback fail`() {
         mockkStatic(Log::class)
+        every { response.code() } returns 400
         every { response.body() } returns arrayOf()
-        every { response.code() } returns 500
-        every { countryView.hideProgress() } just Runs
-        every { countryView.updateCountries(arrayOf()) } just runs
-        every { countryView.showNothingInListOrError() } just runs
+        every {countryDoneState.setValue(arrayOf())} just Runs
+        every {countryDoneState.value} returns arrayOf()
+        every {throwable.localizedMessage} returns "failure"
         every { Log.e(any(), any()) } returns 0
-        val countryCallBack = CountryCallback(countryView)
-        countryCallBack.onFailure(call, Exception("failure"))
-        verify { countryView.hideProgress() }
-        verify { countryView.showNothingInListOrError() }
-        verify { countryView.updateCountries(arrayOf()) }
-        verify { Log.e("CountryPresenter", "Failed to get countries, msg: failure") }
+        val callBack = CountryCallback(countryDoneState)
+        callBack.onFailure(call, throwable)
+        assertArrayEquals(countryDoneState.value, arrayOf())
+        verify { Log.e("CountryCallback", "Failed to get countries, msg: failure") }
         unmockkStatic(Log::class)
     }
+
 }

@@ -42,7 +42,7 @@ class CountryDao {
             .create(CountryService::class.java)
     }
 
-    fun getCountry(callBack: Callback<Array<Country>>) {
+    fun getCountries(callBack: Callback<Array<Country>>) {
         val call = countryService?.getCountries()
         call?.enqueue(callBack)
     }
