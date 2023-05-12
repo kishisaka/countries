@@ -5,10 +5,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ttyl.countries.databinding.ActivityMainBinding
-import kotlinx.coroutines.*
 
 class CountryActivity : AppCompatActivity(), CountryContract.View {
 
@@ -32,17 +32,16 @@ class CountryActivity : AppCompatActivity(), CountryContract.View {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // get countries, present it!
-        countryPresenter = CountryPresenter(CountryCallback(this), this, CountryModel(CountryDao(), Dispatchers.IO))
-        countryPresenter.publishCountries()
+        val viewModel = ViewModelProvider(this)[(CountryViewModel::class.java)]
+        countryPresenter = CountryPresenter(this)
+        viewModel.countryDoneState.observe(this) {
+            countryPresenter.publishCountries(it)
+        }
+        viewModel.getCountries()
     }
 
     override fun updateCountries(countries: Array<Country>) {
         countryAdapter.setItem(countries)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        countryPresenter.onDestroy()
     }
 
     override fun showNothingInListOrError() {
