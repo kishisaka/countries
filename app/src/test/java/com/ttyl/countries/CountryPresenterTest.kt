@@ -1,4 +1,4 @@
-package com.ttyl.countries.com.ttyl.countries
+package com.ttyl.countries
 
 import com.ttyl.countries.*
 import io.mockk.*

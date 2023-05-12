@@ -1,10 +1,7 @@
-package com.ttyl.countries.com.ttyl.countries
+package com.ttyl.countries
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.ttyl.countries.Country
-import com.ttyl.countries.CountryCallback
-import com.ttyl.countries.CountryDao
 import io.mockk.*
 import org.junit.Assert.assertArrayEquals
 import org.junit.Test
